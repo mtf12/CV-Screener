@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#0b1020">
+  <title>HR Console | CV Analysis</title>
+  <link rel="icon"
+    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%234f46e5'/%3E%3Cpath d='M18.5 7H11a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V11.5z M18.5 7v4.5H23 M13 17h6 M13 21h4' fill='none' stroke='%23fff' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=14">
+</head>
+
+<body>
+  <header class="top">
+    <div class="top-inner wide">
+      <span class="brand">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round">
+            <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" />
+            <path d="M14 3v5h5M9 13h6M9 17h4" />
+          </svg>
+        </span>
+        <span>CV Analysis</span>
+        <small>HR Console</small>
+      </span>
+      <span class="top-actions">
+        <button type="button" class="ghost small" id="logout-btn" hidden>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round" aria-hidden="true">
+            <path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l-5-5 5-5M5 12h11" />
+          </svg>
+          Sign out
+        </button>
+      </span>
+    </div>
+  </header>
+
+  <!-- Session check (shown while a saved key is verified) -->
+  <main id="boot-view" class="boot" hidden>
+    <span class="spinner lg" aria-hidden="true"></span>
+    <span>Restoring your session&hellip;</span>
+  </main>
+
+  <!-- Login -->
+  <main id="login-view">
+    <form id="login-form" class="card login">
+      <span class="brand-mark lg" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+          stroke-linejoin="round">
+          <rect x="4" y="11" width="16" height="10" rx="2" />
+          <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+        </svg>
+      </span>
+      <h1>Sign in to HR Console</h1>
+      <p class="hint">Enter your team access key to manage positions and review applicants.</p>
+      <label for="hr-key">Access key</label>
+      <div class="password">
+        <input id="hr-key" type="password" autocomplete="current-password" required spellcheck="false">
+        <button type="button" class="icon-btn" id="toggle-key" aria-label="Show access key" aria-pressed="false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round" aria-hidden="true">
+            <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z" />
+            <circle cx="12" cy="12" r="3" />
+          </svg>
+        </button>
+      </div>
+      <div id="login-notice" class="notice error" role="alert" hidden></div>
+      <button type="submit" class="large block" id="login-btn">Sign in</button>
+    </form>
+  </main>
+
+  <!-- Dashboard -->
+  <main id="dash-view" class="wide" hidden>
+    <div class="layout">
+      <!-- Positions bar: title, "New" button, one chip per position, and a filter -->
+      <section class="positions-bar">
+        <div class="positions-head">
+          <div>
+            <div class="panel-title">Positions</div>
+            <div class="sub" id="job-count"></div>
+          </div>
+          <button type="button" class="small" id="new-job-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"
+              stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+            New
+          </button>
+        </div>
+        <label class="search" for="job-search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="7" />
+            <path d="M20 20l-3.5-3.5" />
+          </svg>
+          <span class="sr-only">Filter positions</span>
+          <input id="job-search" type="search" placeholder="Filter positions" autocomplete="off">
+        </label>
+        <nav id="job-list" class="job-nav" aria-label="Positions"></nav>
+      </section>
+
+      <section class="content">
+        <!-- Shown until a position is picked -->
+        <div id="empty-state" class="card empty">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"
+            stroke-linejoin="round" aria-hidden="true">
+            <circle cx="9" cy="8" r="3.5" />
+            <path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14.5a6.5 6.5 0 0 1 3.5 5.5" />
+          </svg>
+          <p class="empty-title">Select a position</p>
+          <p>Choose a position above to see its applicants, or create a new one.</p>
+        </div>
+
+        <!-- The selected position and its applicants -->
+        <div id="job-panel" hidden>
+          <div class="toolbar">
+            <div class="toolbar-text">
+              <div class="eyebrow">Position</div>
+              <h1 id="panel-title"></h1>
+              <p class="reqs clamp" id="panel-reqs"></p>
+              <button type="button" class="link-btn small" id="reqs-toggle" hidden>Show full requirements</button>
+            </div>
+            <div class="toolbar-actions">
+              <button type="button" class="ghost" id="refresh-btn" aria-label="Refresh applicants">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                  stroke-linejoin="round" aria-hidden="true">
+                  <path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7" />
+                </svg>
+                Refresh
+              </button>
+              <button type="button" id="screen-btn" disabled>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                  stroke-linejoin="round" aria-hidden="true">
+                  <path
+                    d="M12 3l1.9 4.6L18.5 9.5l-4.6 1.9L12 16l-1.9-4.6L5.5 9.5l4.6-1.9zM19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z" />
+                </svg>
+                Screen with AI
+              </button>
+            </div>
+          </div>
+
+          <!-- Stat cards: clicking one filters the table -->
+          <div class="stats" id="stats">
+            <button type="button" class="stat all" data-filter="all">
+              <span class="stat-label">All applicants</span><span class="stat-value" id="stat-total">&ndash;</span>
+            </button>
+            <button type="button" class="stat accepted" data-filter="accepted">
+              <span class="stat-label">Accepted</span><span class="stat-value" id="stat-accepted">&ndash;</span>
+            </button>
+            <button type="button" class="stat rejected" data-filter="rejected">
+              <span class="stat-label">Rejected</span><span class="stat-value" id="stat-rejected">&ndash;</span>
+            </button>
+            <button type="button" class="stat pending" data-filter="pending">
+              <span class="stat-label">Not screened</span><span class="stat-value" id="stat-pending">&ndash;</span>
+            </button>
+          </div>
+
+          <div id="panel-notice" class="notice info" role="status" aria-live="polite" hidden></div>
+
+          <div class="card table-card">
+            <div class="table-tools">
+              <div class="segmented" role="group" aria-label="Filter by result" id="filters">
+                <button type="button" data-filter="all" class="all active" aria-pressed="true">
+                  All <span class="seg-count" data-count="all">0</span>
+                </button>
+                <button type="button" data-filter="accepted" class="accepted" aria-pressed="false">
+                  Accepted <span class="seg-count" data-count="accepted">0</span>
+                </button>
+                <button type="button" data-filter="rejected" class="rejected" aria-pressed="false">
+                  Rejected <span class="seg-count" data-count="rejected">0</span>
+                </button>
+                <button type="button" data-filter="pending" class="pending" aria-pressed="false">
+                  Not screened <span class="seg-count" data-count="pending">0</span>
+                </button>
+              </div>
+              <label class="search" for="cand-search">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                  stroke-linejoin="round" aria-hidden="true">
+                  <circle cx="11" cy="11" r="7" />
+                  <path d="M20 20l-3.5-3.5" />
+                </svg>
+                <span class="sr-only">Search applicants</span>
+                <input id="cand-search" type="search" placeholder="Search name, email, skills" autocomplete="off">
+              </label>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th scope="col" class="col-num">No.</th>
+                    <th scope="col">Candidate</th>
+                    <th scope="col">Profile</th>
+                    <th scope="col">Result</th>
+                    <th scope="col">AI reasoning</th>
+                    <th scope="col"><span class="sr-only">CV</span></th>
+                  </tr>
+                </thead>
+                <tbody id="cand-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- New position dialog -->
+  <dialog id="job-dialog" aria-labelledby="job-dialog-title">
+    <form id="job-form" novalidate>
+      <div class="dialog-head">
+        <div>
+          <h2 id="job-dialog-title">New position</h2>
+          <p class="hint">It is published on the careers page right away.</p>
+        </div>
+        <button type="button" class="icon-btn" id="job-cancel-x" aria-label="Close">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round" aria-hidden="true">
+            <path d="M6 6l12 12M18 6L6 18" />
+          </svg>
+        </button>
+      </div>
+      <div class="dialog-body">
+        <label for="job-title">Job title <span class="req">*</span></label>
+        <input id="job-title" required maxlength="140" placeholder="e.g. Senior Backend Engineer">
+        <label for="job-reqs" class="mt">Requirements <span class="req">*</span></label>
+        <textarea id="job-reqs" required rows="6"
+          placeholder="List the skills, experience and education you are looking for. The AI screening compares applicants against this text."></textarea>
+        <div id="job-notice" class="notice error" role="alert" hidden></div>
+      </div>
+      <div class="dialog-foot">
+        <button type="button" class="ghost" id="job-cancel">Cancel</button>
+        <button type="submit" id="job-btn">Publish position</button>
+      </div>
+    </form>
+  </dialog>
+
+  <footer class="foot">
+    <span>&copy; <span id="year"></span> CV Analysis &middot; HR Console</span>
+  </footer>
+
+  <script src="config.js?v=14"></script>
+  <script src="common.js?v=14"></script>
+  <script src="hr.js?v=14"></script>
+</body>
+
+</html>

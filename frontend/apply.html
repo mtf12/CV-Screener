@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Apply for a position in minutes. Upload your CV and we fill in the application for you.">
+  <meta name="theme-color" content="#0b1020">
+  <title>Apply | CV Analysis</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%234f46e5'/%3E%3Cpath d='M18.5 7H11a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V11.5z M18.5 7v4.5H23 M13 17h6 M13 21h4' fill='none' stroke='%23fff' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=14">
+</head>
+
+<body>
+  <header class="top">
+    <div class="top-inner">
+      <a class="brand" href="index.html" aria-label="CV Analysis careers home">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round">
+            <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" />
+            <path d="M14 3v5h5M9 13h6M9 17h4" />
+          </svg>
+        </span>
+        <span>CV Analysis</span>
+      </a>
+      <span class="tag">Careers</span>
+    </div>
+  </header>
+
+
+  <main>
+    <!-- Shown while the position is being loaded -->
+    <section id="loading-view" class="boot">
+      <span class="spinner lg" aria-hidden="true"></span>
+      <span>Loading the position&hellip;</span>
+    </section>
+
+    <!-- Shown when the link has no valid position, or the position could not be loaded -->
+    <section id="missing-view" hidden>
+      <div class="card empty">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"
+          stroke-linejoin="round" aria-hidden="true">
+          <rect x="3" y="7" width="18" height="13" rx="2" />
+          <path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M3 13h18" />
+        </svg>
+        <p class="empty-title" id="missing-title"></p>
+        <p id="missing-text"></p>
+        <div class="empty-actions">
+          <button type="button" class="ghost" id="retry-btn" hidden>Try again</button>
+          <a class="btn" href="index.html">See open positions</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- The application form: job summary on the left, form on the right -->
+    <section id="apply-view" hidden>
+      <a class="btn link-btn" id="back-btn" href="index.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+          stroke-linejoin="round" aria-hidden="true">
+          <path d="M15 18l-6-6 6-6" />
+        </svg>
+        All positions
+      </a>
+
+      <div class="apply-layout">
+        <aside class="apply-aside">
+          <div class="card job-summary">
+            <div class="eyebrow">Applying for</div>
+            <h1 id="apply-title"></h1>
+            <div class="summary-label">Requirements</div>
+            <p class="reqs" id="apply-reqs"></p>
+          </div>
+
+          <ol class="steps" id="steps" aria-label="Application progress">
+            <li data-step="1"><span class="step-dot">1</span><span class="step-text"><strong>Upload your
+                  CV</strong><small>PDF, up to 5 MB</small></span></li>
+            <li data-step="2"><span class="step-dot">2</span><span class="step-text"><strong>Review your
+                  details</strong><small>Check every field</small></span></li>
+            <li data-step="3"><span class="step-dot">3</span><span
+                class="step-text"><strong>Submit</strong><small>We'll be in touch</small></span></li>
+          </ol>
+        </aside>
+
+        <div>
+          <!-- Upload a CV and let the AI fill in the form -->
+          <div class="card">
+            <div class="card-head">
+              <span class="icon-badge" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                  stroke-linejoin="round">
+                  <path
+                    d="M12 3l1.9 4.6L18.5 9.5l-4.6 1.9L12 16l-1.9-4.6L5.5 9.5l4.6-1.9zM19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z" />
+                </svg>
+              </span>
+              <div>
+                <h2>Autofill from your CV <span class="optional">Optional</span></h2>
+                <p class="hint">Upload your CV and we'll fill in the form and attach the file to your application.</p>
+              </div>
+            </div>
+            <div id="drop-top" class="dropzone" tabindex="0" role="button"
+              aria-label="Upload your CV to autofill the form">
+              <span class="dz-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                  stroke-linejoin="round">
+                  <path d="M12 16V4M7 9l5-5 5 5M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" />
+                </svg>
+              </span>
+              <strong>Drop your CV here to autofill the form</strong>
+              <span><u>Click to browse</u> &middot; PDF only, up to 5 MB</span>
+              <input type="file" id="input-top" accept="application/pdf,.pdf" hidden>
+            </div>
+            <div id="chip-top" class="file-chip" hidden>
+              <span class="file-icon" aria-hidden="true">PDF</span>
+              <span class="file-meta">
+                <strong id="name-top"></strong>
+                <span id="size-top"></span>
+              </span>
+              <span class="file-actions">
+                <button type="button" class="ghost small" id="refill-btn">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round" aria-hidden="true">
+                    <path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7" />
+                  </svg>
+                  Refill form
+                </button>
+                <button type="button" class="ghost small danger" id="remove-top">Remove</button>
+              </span>
+            </div>
+            <div id="fill-notice" class="notice info" role="status" aria-live="polite" hidden></div>
+          </div>
+
+          <form id="apply-form" class="card" novalidate>
+            <div class="card-head">
+              <span class="icon-badge" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                  stroke-linejoin="round">
+                  <circle cx="12" cy="8" r="4" />
+                  <path d="M4 21a8 8 0 0 1 16 0" />
+                </svg>
+              </span>
+              <div>
+                <h2>Your details</h2>
+                <p class="hint">Fields marked with <span class="req">*</span> are required.</p>
+              </div>
+            </div>
+
+            <fieldset class="group">
+              <legend>Contact</legend>
+              <div class="grid">
+                <div class="full">
+                  <label for="full_name">Full name <span class="req">*</span></label>
+                  <input id="full_name" name="full_name" required autocomplete="name" maxlength="120">
+                </div>
+                <div>
+                  <label for="email">Email <span class="req">*</span></label>
+                  <input id="email" name="email" type="email" required autocomplete="email" maxlength="160">
+                </div>
+                <div>
+                  <label for="phone">Phone <span class="req">*</span></label>
+                  <input id="phone" name="phone" type="tel" required autocomplete="tel" maxlength="40">
+                </div>
+              </div>
+            </fieldset>
+
+            <fieldset class="group">
+              <legend>Experience</legend>
+              <div class="grid">
+                <div>
+                  <label for="current_title">Current job title</label>
+                  <input id="current_title" name="current_title" autocomplete="organization-title" maxlength="120">
+                </div>
+                <div>
+                  <label for="years_experience">Years of experience</label>
+                  <input id="years_experience" name="years_experience" type="number" min="0" max="60" step="0.1"
+                    inputmode="decimal">
+                </div>
+              </div>
+            </fieldset>
+
+            <fieldset class="group">
+              <legend>Education</legend>
+              <div class="grid">
+                <div class="full">
+                  <label for="university">University</label>
+                  <input id="university" name="university" maxlength="160">
+                </div>
+                <div>
+                  <label for="degree">Degree</label>
+                  <input id="degree" name="degree" maxlength="120">
+                </div>
+                <div>
+                  <label for="graduation_year">Graduation year</label>
+                  <input id="graduation_year" name="graduation_year" type="number" min="1950" max="2100" step="1"
+                    inputmode="numeric">
+                </div>
+              </div>
+            </fieldset>
+
+            <fieldset class="group">
+              <legend>Skills</legend>
+              <label for="skills" class="sr-only">Skills</label>
+              <textarea id="skills" name="skills" placeholder="e.g. Python, SQL, project management"></textarea>
+            </fieldset>
+
+            <hr class="divider">
+
+            <!-- Attach the CV without touching the form -->
+            <div class="card-head">
+              <span class="icon-badge" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                  stroke-linejoin="round">
+                  <path
+                    d="M21 12.5l-8.6 8.6a5.5 5.5 0 0 1-7.8-7.8l9-9a3.7 3.7 0 0 1 5.2 5.2l-9 9a1.8 1.8 0 0 1-2.6-2.6l8.3-8.3" />
+                </svg>
+              </span>
+              <div>
+                <h2>CV attachment <span class="req">*</span></h2>
+                <p class="hint" id="attach-hint">Filled in the form yourself? Attach your CV here. It is sent with your
+                  application and doesn't change the form.</p>
+              </div>
+            </div>
+            <div id="drop-bottom" class="dropzone compact" tabindex="0" role="button" aria-label="Attach your CV">
+              <span class="dz-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                  stroke-linejoin="round">
+                  <path d="M12 16V4M7 9l5-5 5 5M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" />
+                </svg>
+              </span>
+              <strong>Drop your CV here to attach it</strong>
+              <span><u>Click to browse</u> &middot; PDF only, up to 5 MB</span>
+              <input type="file" id="input-bottom" accept="application/pdf,.pdf" hidden>
+            </div>
+            <div id="chip-bottom" class="file-chip" hidden>
+              <span class="file-icon" aria-hidden="true">PDF</span>
+              <span class="file-meta">
+                <strong id="name-bottom"></strong>
+                <span id="size-bottom"></span>
+              </span>
+              <span class="file-actions">
+                <button type="button" class="ghost small danger" id="remove-bottom">Remove</button>
+              </span>
+            </div>
+            <div id="apply-notice" class="notice info" role="status" aria-live="polite" hidden></div>
+
+            <div class="form-footer">
+              <p class="fine">By submitting, you agree that we store your details and CV to review your application.
+              </p>
+              <button type="submit" class="large" id="submit-btn">Submit application</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- Confirmation after a successful submit -->
+    <section id="done-view" hidden>
+      <div class="card done">
+        <div class="done-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+            stroke-linejoin="round">
+            <path d="M5 12.5l4.5 4.5L19 7.5" />
+          </svg>
+        </div>
+        <h1>Application received</h1>
+        <p>Thank you for applying<span id="done-job"></span>. Our team will review your application and get back to
+          you by email.</p>
+        <a class="btn" id="done-btn" href="index.html">Browse more positions</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <span>&copy; <span id="year"></span> CV Analysis</span>
+  </footer>
+
+  <script src="config.js?v=14"></script>
+  <script src="common.js?v=14"></script>
+  <script src="apply.js?v=14"></script>
+</body>
+
+</html>

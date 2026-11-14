@@ -1,0 +1,121 @@
+{
+  "name": "6-error-handler",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "50078966-26f3-4c0f-9c82-92eed56b76ac",
+      "name": "Error Trigger"
+    },
+    {
+      "parameters": {
+        "tableId": "workflow_errors",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "workflow_name",
+              "fieldValue": "={{ $json.workflow.name }}"
+            },
+            {
+              "fieldId": "node_name",
+              "fieldValue": "={{ $json.execution.lastNodeExecuted }}"
+            },
+            {
+              "fieldId": "message",
+              "fieldValue": "={{ $json.execution.error.message }}"
+            },
+            {
+              "fieldId": "execution_url",
+              "fieldValue": "={{ $json.execution.url }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        224,
+        0
+      ],
+      "id": "68bfc33c-f438-47e3-a75c-fedd51b0ae25",
+      "name": "Log Error",
+      "credentials": {
+        "supabaseApi": {
+          "id": "YMAlSFhPlvQLq62o",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "mohammedtalaatfayez@gmail.com",
+        "toEmail": "mohammedtalaatfayez@icloud.com",
+        "subject": "={{ 'CV Analysis error: ' + $('Error Trigger').item.json.workflow.name }}",
+        "emailFormat": "text",
+        "text": "=Workflow: {{ $('Error Trigger').item.json.workflow.name }}\nNode: {{ $('Error Trigger').item.json.execution.lastNodeExecuted }}\nError: {{ String($('Error Trigger').item.json.execution.error.message).slice(0, 500) }}\n\nOpen the failed execution:\n{{ $('Error Trigger').item.json.execution.url }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        448,
+        0
+      ],
+      "id": "5824c5c8-3e7f-4cf7-9752-d6475c9f0197",
+      "name": "Send Alert Email",
+      "webhookId": "7c13c38a-e02e-4a8e-9166-3d747c77b502",
+      "credentials": {
+        "smtp": {
+          "id": "uv9D4wuGFuwcxEum",
+          "name": "SMTP account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Log Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Error": {
+      "main": [
+        [
+          {
+            "node": "Send Alert Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "cefc4fd2-efaf-4e49-a472-0cd71f2dd89a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "51718d675df0744bcbaf923a0726fcd9e53c3c4aa671e45d38764b6c3359f352"
+  },
+  "nodeGroups": [],
+  "id": "eGFln5rPOl0IiNUx",
+  "tags": []
+}

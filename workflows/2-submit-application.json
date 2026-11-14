@@ -1,0 +1,349 @@
+{
+  "name": "2-submit-application",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "submit-application",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "2c1cc971-a43e-488a-9fd5-6c360d55f69d",
+      "name": "Webhook",
+      "webhookId": "469d10d4-0ccc-46aa-bbee-9cf4e0a62af9"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\"ok\": true}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1328,
+        -288
+      ],
+      "id": "5f3b6beb-03d9-49f6-9914-652573b7c52b",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\"ok\": false, \"error\": \"invalid_request\"}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        496,
+        192
+      ],
+      "id": "0c780dd9-deb2-43d8-8246-252e26537ec6",
+      "name": "Respond Invalid"
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "binaryPropertyName": "cv",
+        "options": {
+          "keepSource": "both"
+        }
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        464,
+        -192
+      ],
+      "id": "88a78356-bece-44e3-8b60-3609e8de5c23",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://zbcukhcctliduxbvflce.supabase.co/storage/v1/object/cvs/{{ $now.toMillis() }}-{{ Math.random().toString(36).slice(2, 8) }}.pdf",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendBody": true,
+        "contentType": "binaryData",
+        "inputDataFieldName": "cv",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        736,
+        -192
+      ],
+      "id": "541795bc-65a6-419a-aea2-1dc5ac235153",
+      "name": "Upload CV",
+      "credentials": {
+        "supabaseApi": {
+          "id": "YMAlSFhPlvQLq62o",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "candidates",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "job_id",
+              "fieldValue": "={{ $('Extract from File').item.json.body.job_id }}"
+            },
+            {
+              "fieldId": "full_name",
+              "fieldValue": "={{ $('Extract from File').item.json.body.full_name }}"
+            },
+            {
+              "fieldId": "email",
+              "fieldValue": "={{ $('Extract from File').item.json.body.email }}"
+            },
+            {
+              "fieldId": "phone",
+              "fieldValue": "={{ $('Extract from File').item.json.body.phone }}"
+            },
+            {
+              "fieldId": "current_title",
+              "fieldValue": "={{ $('Extract from File').item.json.body.current_title || null }}"
+            },
+            {
+              "fieldId": "years_experience",
+              "fieldValue": "={{ $('Extract from File').item.json.body.years_experience || null }}"
+            },
+            {
+              "fieldId": "university",
+              "fieldValue": "={{ $('Extract from File').item.json.body.university || null }}"
+            },
+            {
+              "fieldId": "degree",
+              "fieldValue": "={{ $('Extract from File').item.json.body.degree || null }}"
+            },
+            {
+              "fieldId": "graduation_year",
+              "fieldValue": "={{ $('Extract from File').item.json.body.graduation_year || null }}"
+            },
+            {
+              "fieldId": "skills",
+              "fieldValue": "={{ $('Extract from File').item.json.body.skills || null }}"
+            },
+            {
+              "fieldId": "cv_text",
+              "fieldValue": "={{ $('Extract from File').item.json.text  }}"
+            },
+            {
+              "fieldId": "cv_path",
+              "fieldValue": "={{ $json.Key }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        960,
+        -192
+      ],
+      "id": "15cba7c1-8706-4316-aa0a-cfbc8216e5cb",
+      "name": "Save Candidate",
+      "credentials": {
+        "supabaseApi": {
+          "id": "YMAlSFhPlvQLq62o",
+          "name": "Supabase account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\"ok\": false, \"error\": \"{{ JSON.stringify($json).includes('duplicate') ? 'already_applied' : 'save_failed' }}\"}",
+        "options": {
+          "responseCode": 409
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1344,
+        16
+      ],
+      "id": "56f2c558-b3c0-4ae7-a4b7-dfd8b0c893fe",
+      "name": "Respond save failed"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "4055b193-9cc7-44d3-b688-4a9681273b40",
+              "leftValue": "={{ $binary.cv?.mimeType }}",
+              "rightValue": "application/pdf",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "dac8c94c-06b8-4a9f-b5c4-3ab22a7c8f7c",
+              "leftValue": "={{ $json.body.job_id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "ca097383-3291-48e9-93f3-724dc803c62e",
+              "leftValue": "={{ $json.body.full_name }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "c6354d78-eb05-4099-b776-d0e90355a26d",
+              "leftValue": "={{ $json.body.email }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "11342f4b-12d5-43b8-8df6-d6e5a9d83c27",
+              "leftValue": "={{ $json.body.phone }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        224,
+        0
+      ],
+      "id": "f4019d5d-b11f-48b7-ba7b-5acd2a8717c8",
+      "name": "if specified fields is completed"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "if specified fields is completed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Upload CV",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload CV": {
+      "main": [
+        [
+          {
+            "node": "Save Candidate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Candidate": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond save failed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "if specified fields is completed": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond Invalid",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "eGFln5rPOl0IiNUx",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "0dc3dc56-b261-4a7a-b543-ae896ca23d18",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "51718d675df0744bcbaf923a0726fcd9e53c3c4aa671e45d38764b6c3359f352"
+  },
+  "nodeGroups": [],
+  "id": "LpKLOCg2C5ieacO4",
+  "tags": []
+}

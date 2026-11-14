@@ -1,0 +1,393 @@
+{
+  "name": "4-screen-candidates",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "screen",
+        "authentication": "headerAuth",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "ea9a2ce8-155f-4301-8c75-8a92c429ecb8",
+      "name": "Webhook",
+      "webhookId": "f6a2bb59-dc3a-4559-a485-366cf90de12b",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "1SaIYWjTqeCziuya",
+          "name": "HR Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "jobs",
+        "limit": 1,
+        "orderBy": "created_at.desc",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{ $json.body.job_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        224,
+        0
+      ],
+      "id": "d8470ebf-1e99-493b-bcaf-e6fa886c8732",
+      "name": "Get unique jop",
+      "credentials": {
+        "supabaseApi": {
+          "id": "YMAlSFhPlvQLq62o",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1680,
+        -288
+      ],
+      "id": "6bceb368-954c-41f6-bfb2-ff91f3fc11f8",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "1623d765-2489-462b-8581-8c813f0bfde8",
+              "leftValue": "={{ $json.id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        672,
+        0
+      ],
+      "id": "a60addae-7345-42ab-8ec2-14d413f1a944",
+      "name": "Has candidates"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\"ok\": true, \"screened\": 0}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1008,
+        176
+      ],
+      "id": "8b74e7db-6764-404c-88df-d8050a0f8239",
+      "name": "Respond No Candidates"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://zbcukhcctliduxbvflce.supabase.co/rest/v1/screenings?on_conflict=job_id,candidate_id",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Prefer",
+              "value": "resolution=merge-duplicates,return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "job_id",
+              "value": "={{ $('Get Candidates').item.json.job_id }}"
+            },
+            {
+              "name": "candidate_id",
+              "value": "={{ $('Get Candidates').item.json.id }}"
+            },
+            {
+              "name": "score",
+              "value": "={{ Math.round($json.output.score) }}"
+            },
+            {
+              "name": "status",
+              "value": "={{ $json.output.score >= 70 ? 'Accepted' : 'Rejected' }}"
+            },
+            {
+              "name": "reason",
+              "value": "={{ $json.output.reason }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        1360,
+        -288
+      ],
+      "id": "8674da05-1aaf-4342-8d72-adddcee2bbf6",
+      "name": "Save Screening",
+      "credentials": {
+        "supabaseApi": {
+          "id": "YMAlSFhPlvQLq62o",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://zbcukhcctliduxbvflce.supabase.co/rest/v1/candidates",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "job_id",
+              "value": "=eq.{{ $json.id }}"
+            },
+            {
+              "name": "select",
+              "value": "id,job_id,cv_text,screenings(id)"
+            },
+            {
+              "name": "screenings",
+              "value": "is.null"
+            },
+            {
+              "name": "order",
+              "value": "created_at.asc"
+            },
+            {
+              "name": "limit",
+              "value": "10"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        448,
+        0
+      ],
+      "id": "2c43d944-5eac-4e2d-841a-be29e0e8634b",
+      "name": "Get Candidates",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "YMAlSFhPlvQLq62o",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "dSJ0Ti2YgHJE2Y8q",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/dSJ0Ti2YgHJE2Y8q",
+          "cachedResultName": "0-score-cv"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "job_title": "={{ $('Get unique jop').item.json.title }}",
+            "requirements": "={{ $('Get unique jop').item.json.requirements }}",
+            "cv_text": "={{ $json.cv_text }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "job_title",
+              "displayName": "job_title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "requirements",
+              "displayName": "requirements",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "cv_text",
+              "displayName": "cv_text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "mode": "each",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        1008,
+        -144
+      ],
+      "id": "e5c1efdf-4ba8-41e5-8e29-ef1dfe75ef63",
+      "name": "Score Candidate",
+      "onError": "continueErrorOutput"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Get unique jop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get unique jop": {
+      "main": [
+        [
+          {
+            "node": "Get Candidates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond to Webhook": {
+      "main": [
+        []
+      ]
+    },
+    "Has candidates": {
+      "main": [
+        [
+          {
+            "node": "Score Candidate",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond No Candidates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Screening": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Candidates": {
+      "main": [
+        [
+          {
+            "node": "Has candidates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Score Candidate": {
+      "main": [
+        [
+          {
+            "node": "Save Screening",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "eGFln5rPOl0IiNUx",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "f7acfdb9-30b5-4720-9381-93ddff9e1f2f",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "51718d675df0744bcbaf923a0726fcd9e53c3c4aa671e45d38764b6c3359f352"
+  },
+  "nodeGroups": [],
+  "id": "zCbeqjMQQFXfFBKW",
+  "tags": []
+}

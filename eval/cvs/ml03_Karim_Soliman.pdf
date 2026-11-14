@@ -1,0 +1,91 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Contents 4 0 R /Resources << /Font << /F1 5 0 R /F2 6 0 R >> >> >>
+endobj
+4 0 obj
+<< /Length 1252 >>
+stream
+BT
+50 790 Td
+14 TL
+/F2 12 Tf
+(Karim Soliman) Tj T*
+/F1 10 Tf
+(ML ENGINEER \(NLP\)) Tj T*
+/F1 10 Tf
+(Cairo, Egypt | +20 100 100 0003 | eval.ml03@example.com) Tj T*
+/F1 10 Tf
+() Tj T*
+/F2 12 Tf
+(Summary) Tj T*
+/F1 10 Tf
+(ML engineer focused on natural language processing, with one and a half years of industry) Tj T*
+/F1 10 Tf
+(experience.) Tj T*
+/F1 10 Tf
+() Tj T*
+/F2 12 Tf
+(Experience) Tj T*
+/F2 12 Tf
+(ML Engineer - Lexica AI) Tj T*
+/F1 10 Tf
+(May 2025 - Present) Tj T*
+/F1 10 Tf
+(- Fine-tuned transformer models in Python for Arabic text classification.) Tj T*
+/F1 10 Tf
+(- Built a training data pipeline that pulls labelled tickets from a PostgreSQL database with) Tj T*
+/F1 10 Tf
+(  SQL.) Tj T*
+/F1 10 Tf
+(- Reduced inference latency by 35 percent through model distillation.) Tj T*
+/F1 10 Tf
+() Tj T*
+/F2 12 Tf
+(Education) Tj T*
+/F1 10 Tf
+(M.Sc. in Artificial Intelligence, Ain Shams University, 2023 - 2025 | B.Sc. in Computer Science,) Tj T*
+/F1 10 Tf
+(Ain Shams University, 2019 - 2023) Tj T*
+/F1 10 Tf
+() Tj T*
+/F2 12 Tf
+(Skills) Tj T*
+/F1 10 Tf
+(Python, SQL, PyTorch, Hugging Face Transformers, FastAPI, Docker) Tj T*
+/F1 10 Tf
+() Tj T*
+/F2 12 Tf
+(Languages) Tj T*
+/F1 10 Tf
+(Arabic: Native | English: Very good) Tj T*
+/F1 10 Tf
+() Tj T*
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+6 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>
+endobj
+xref
+0 7
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000251 00000 n 
+0000001555 00000 n 
+0000001625 00000 n 
+trailer
+<< /Size 7 /Root 1 0 R >>
+startxref
+1700
+%%EOF

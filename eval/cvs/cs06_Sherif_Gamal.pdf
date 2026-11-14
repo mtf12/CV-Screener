@@ -1,0 +1,83 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Contents 4 0 R /Resources << /Font << /F1 5 0 R /F2 6 0 R >> >> >>
+endobj
+4 0 obj
+<< /Length 933 >>
+stream
+BT
+50 790 Td
+14 TL
+/F2 12 Tf
+(Sherif Gamal) Tj T*
+/F1 10 Tf
+(SOFTWARE ENGINEER) Tj T*
+/F1 10 Tf
+(Cairo, Egypt | +20 100 200 0006 | eval.cs06@example.com) Tj T*
+/F1 10 Tf
+() Tj T*
+/F2 12 Tf
+(Summary) Tj T*
+/F1 10 Tf
+(Back-end software engineer with five years of experience in payment systems.) Tj T*
+/F1 10 Tf
+() Tj T*
+/F2 12 Tf
+(Experience) Tj T*
+/F2 12 Tf
+(Software Engineer - PayLane) Tj T*
+/F1 10 Tf
+(Feb 2022 - Present) Tj T*
+/F1 10 Tf
+(- Designed and maintained payment APIs in Java and Spring Boot.) Tj T*
+/F1 10 Tf
+(- Reduced transaction failures by 18 percent.) Tj T*
+/F1 10 Tf
+() Tj T*
+/F2 12 Tf
+(Education) Tj T*
+/F1 10 Tf
+(B.Sc. in Computer Engineering, Ain Shams University, 2017 - 2021) Tj T*
+/F1 10 Tf
+() Tj T*
+/F2 12 Tf
+(Skills) Tj T*
+/F1 10 Tf
+(Java, Spring Boot, PostgreSQL, Kafka, Docker) Tj T*
+/F1 10 Tf
+() Tj T*
+/F2 12 Tf
+(Languages) Tj T*
+/F1 10 Tf
+(Arabic: Native | English: Fluent) Tj T*
+/F1 10 Tf
+() Tj T*
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+6 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>
+endobj
+xref
+0 7
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000251 00000 n 
+0000001235 00000 n 
+0000001305 00000 n 
+trailer
+<< /Size 7 /Root 1 0 R >>
+startxref
+1380
+%%EOF
