@@ -120,7 +120,7 @@
     },
     {
       "parameters": {
-        "model": "qwen/qwen3.8-27b",
+        "model": "openai/gpt-oss-120b",
         "options": {}
       },
       "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
@@ -336,7 +336,7 @@
     "errorWorkflow": "eGFln5rPOl0IiNUx",
     "callerPolicy": "workflowsFromSameOwner"
   },
-  "versionId": "5657fe4f-1639-4976-bc05-33d0ebd0bb46",
+  "versionId": "47912808-f568-42c9-8dfe-8442f842eb95",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "51718d675df0744bcbaf923a0726fcd9e53c3c4aa671e45d38764b6c3359f352"

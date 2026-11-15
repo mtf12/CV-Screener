@@ -58,7 +58,7 @@ The important part: **the browser only talks to n8n.** The pages don't know the 
 | Backend | n8n | Every step is visible as a node, easy to follow and change |
 | Database | Supabase (PostgreSQL) | Free tier, real relations and constraints, row level security |
 | File storage | Supabase Storage | CVs stay in a private bucket |
-| AI models | Groq, one model per task: `openai/gpt-oss-120b` scores CVs, `qwen/qwen3.8-27b` does autofill, `openai/gpt-oss-20b` writes the test CVs | Fast and free. Each model has its own daily quota, so giving every task its own model triples the free capacity. Autofill moved to a smaller model only after it read the name and email correctly in 22 of 22 test CVs |
+| AI models | Groq: `openai/gpt-oss-120b` for scoring and autofill, `openai/gpt-oss-20b` for writing test CVs | Fast and free. Each model has its own daily quota, so the test CVs never eat into the quota the live app uses |
 | Frontend | Plain HTML, CSS and JavaScript | No build step, can be hosted anywhere |
 | Email | Gmail over SMTP | Error alerts and accuracy reports |
 
@@ -66,22 +66,22 @@ The important part: **the browser only talks to n8n.** The pages don't know the 
 
 Every AI call costs tokens, and the free tier gives each model a fixed number per day. So the project treats tokens like any other limited resource: spend them where they change the result, and nowhere else.
 
-**The right model for each job.** Not every task needs the strongest model. Each one gets the smallest model that still does it well, and because every model has its own daily quota, no task can use up another task's budget.
+**The right model for each job.** Not every task needs the strongest model, and every model has its own daily quota. So the work is split by how much it matters.
 
-| Task | How hard it is | Model |
+| Task | How much it matters | Model |
 |---|---|---|
-| Scoring a CV against the requirements | Hard. It needs judgement, and it's the decision HR sees | `openai/gpt-oss-120b`, the strongest |
-| Writing test CVs for the accuracy check | Medium. It has to follow a profile closely, or the test means nothing | `openai/gpt-oss-20b` |
-| Reading the name, email and details from a CV | Easy. It's copying facts, not judging them | `qwen/qwen3.8-27b` |
+| Scoring a CV against the requirements | It's the decision HR sees | `openai/gpt-oss-120b`, the strongest |
+| Reading the name, email and details from a CV | The applicant sees it straight away, and wrong fields mean a bad first impression | `openai/gpt-oss-120b` |
+| Writing test CVs for the accuracy check | Internal only, runs once a week | `openai/gpt-oss-20b`, on its own quota |
 
-Models were only moved after measuring. Autofill went to the smaller model once `python3 eval/run_eval.py --parse-only` showed it read the name and email correctly in 22 of 22 test CVs.
+Autofill was moved to a smaller model at one point to save quota. It passed the automated check (name and email correct in 22 of 22 test CVs, using `python3 eval/run_eval.py --parse-only`), but in real use it mixed up other fields such as job title and experience. So autofill went back to the strong model. Saving tokens is only worth it while the result stays right.
 
 **No AI call that isn't needed.**
 
 - Submitting an application uses no AI at all. The CV text is read straight from the PDF.
 - Screening only scores applicants who don't have a result yet. Pressing the button again costs nothing.
 - Screening runs in batches of 10, so one press never spends the whole quota at once.
-- The accuracy check runs once a week, not every day. A full run uses about half of one model's daily quota, on one day a week.
+- The accuracy check runs once a week, not every day. A full run uses under half of the strong model's daily quota, on one day a week.
 - Retries are limited to three, with a pause in between, so a bad minute at the provider can't turn into hundreds of wasted calls.
 
 ---
