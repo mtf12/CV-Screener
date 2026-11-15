@@ -899,7 +899,10 @@
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate",
-    "availableInMCP": false
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "eGFln5rPOl0IiNUx",
+    "callerPolicy": "workflowsFromSameOwner"
   },
   "versionId": "8183275d-6766-4180-a57a-b46e97c5687c",
   "meta": {
