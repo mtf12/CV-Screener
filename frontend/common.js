@@ -37,7 +37,9 @@ function spinner() {
 // Call an n8n webhook. Never throws: a network failure comes back as status 0.
 async function api(path, options = {}) {
   try {
-    const res = await fetch(API + path, options);
+    // ngrok's free plan shows a warning page to browsers unless this header is sent.
+    const headers = { 'ngrok-skip-browser-warning': 'true', ...(options.headers || {}) };
+    const res = await fetch(API + path, { ...options, headers });
     let data = null;
     try { data = await res.json(); } catch { /* empty or non-JSON body */ }
     return { ok: res.ok, status: res.status, data };
