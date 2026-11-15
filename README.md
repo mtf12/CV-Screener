@@ -58,9 +58,31 @@ The important part: **the browser only talks to n8n.** The pages don't know the 
 | Backend | n8n | Every step is visible as a node, easy to follow and change |
 | Database | Supabase (PostgreSQL) | Free tier, real relations and constraints, row level security |
 | File storage | Supabase Storage | CVs stay in a private bucket |
-| AI model | Groq (`openai/gpt-oss-120b`) | Fast, and has a free tier |
+| AI models | Groq, one model per task: `openai/gpt-oss-120b` scores CVs, `qwen/qwen3.8-27b` does autofill, `openai/gpt-oss-20b` writes the test CVs | Fast and free. Each model has its own daily quota, so giving every task its own model triples the free capacity. Autofill moved to a smaller model only after it read the name and email correctly in 22 of 22 test CVs |
 | Frontend | Plain HTML, CSS and JavaScript | No build step, can be hosted anywhere |
 | Email | Gmail over SMTP | Error alerts and accuracy reports |
+
+### Keeping AI usage low
+
+Every AI call costs tokens, and the free tier gives each model a fixed number per day. So the project treats tokens like any other limited resource: spend them where they change the result, and nowhere else.
+
+**The right model for each job.** Not every task needs the strongest model. Each one gets the smallest model that still does it well, and because every model has its own daily quota, no task can use up another task's budget.
+
+| Task | How hard it is | Model |
+|---|---|---|
+| Scoring a CV against the requirements | Hard. It needs judgement, and it's the decision HR sees | `openai/gpt-oss-120b`, the strongest |
+| Writing test CVs for the accuracy check | Medium. It has to follow a profile closely, or the test means nothing | `openai/gpt-oss-20b` |
+| Reading the name, email and details from a CV | Easy. It's copying facts, not judging them | `qwen/qwen3.8-27b` |
+
+Models were only moved after measuring. Autofill went to the smaller model once `python3 eval/run_eval.py --parse-only` showed it read the name and email correctly in 22 of 22 test CVs.
+
+**No AI call that isn't needed.**
+
+- Submitting an application uses no AI at all. The CV text is read straight from the PDF.
+- Screening only scores applicants who don't have a result yet. Pressing the button again costs nothing.
+- Screening runs in batches of 10, so one press never spends the whole quota at once.
+- The accuracy check runs once a week, not every day. A full run uses about half of one model's daily quota, on one day a week.
+- Retries are limited to three, with a pause in between, so a bad minute at the provider can't turn into hundreds of wasted calls.
 
 ---
 
@@ -75,7 +97,7 @@ The important part: **the browser only talks to n8n.** The pages don't know the 
 | 4 | `screen-candidates` | HR presses Screen | Scores up to 10 unscored applicants of a job and saves the results |
 | 5 | `list-candidates` | HR opens a position | Returns applicants with their results, and a short-lived link to a CV |
 | 6 | `error-handler` | Any workflow fails | Logs every error and emails a link to the failed run, at most once per hour per workflow |
-| 7 | `accuracy-check` | Every 2 days | Writes new test CVs, scores them with a fixed test set, emails a report |
+| 7 | `accuracy-check` | Every week | Writes new test CVs, scores them with a fixed test set, emails a report |
 
 ### A few decisions worth knowing
 
@@ -259,7 +281,7 @@ To be honest about what these numbers mean: the CVs are synthetic, and the promp
 
 ### Two ways to run it
 
-- **Automatically:** workflow 7 runs every two days, saves the numbers in `eval_runs`, and emails a report with every disagreement explained.
+- **Automatically:** workflow 7 runs every week, saves the numbers in `eval_runs`, and emails a report with every disagreement explained.
 - **By hand:** `python3 eval/run_eval.py` sends the PDFs through the real public flow (autofill, submit, screen) and writes `eval/results.md`. It asks for the HR key and doesn't store it.
 
 ### Why the test can be trusted

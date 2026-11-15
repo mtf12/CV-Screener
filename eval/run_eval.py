@@ -9,6 +9,7 @@ Usage (n8n must be running, workflows published):
 
     python3 eval/run_eval.py              # full run, asks for the HR access key
     python3 eval/run_eval.py --pdfs-only  # only build the PDFs in eval/cvs/
+    python3 eval/run_eval.py --parse-only # only test autofill, saves nothing
 
 Only the Python standard library is used. The HR key is typed at a hidden
 prompt (or read from the HR_KEY environment variable) and is never stored.
@@ -316,6 +317,8 @@ def main():
     parser.add_argument("--pdfs-only", action="store_true", help="only build the PDFs")
     parser.add_argument("--skip-parse", action="store_true", help="skip the autofill check (saves 20 AI calls)")
     parser.add_argument("--sql", action="store_true", help="only write eval_cases.sql for the scheduled n8n check")
+    parser.add_argument("--parse-only", action="store_true",
+                        help="only test autofill (parse-cv); no HR key needed and nothing is saved")
     args = parser.parse_args()
 
     cases = json.loads((HERE / "dataset.json").read_text())["cases"]
@@ -325,6 +328,12 @@ def main():
     write_pdfs(cases)
     print(f"Built {len(cases)} PDFs in {CV_DIR}")
     if args.pdfs_only:
+        return
+
+    if args.parse_only:
+        parse_step(cases)
+        ok = sum(1 for c in cases if c["parse_ok"])
+        print(f"\nAutofill read the name and email correctly in {ok} of {len(cases)} CVs")
         return
 
     status, data = request("GET", "/jobs")

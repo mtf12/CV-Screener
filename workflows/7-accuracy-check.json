@@ -6,8 +6,11 @@
         "rule": {
           "interval": [
             {
-              "daysInterval": 2,
-              "triggerAtHour": 9
+              "field": "weeks",
+              "triggerAtDay": [
+                1
+              ],
+              "triggerAtHour": 8
             }
           ]
         }
@@ -462,7 +465,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Runs once, after the scoring loop, on all results. Builds the numbers and the email.\nconst scored = (r) => r.id && r.reason && ['Accepted', 'Rejected'].includes(r.status) && Number.isFinite(Number(r.score));\nconst results = $input.all().map((item) => item.json).filter(scored);\nconst totalCases = $('Get Cases').all().length;\nconst newCases = $('Collect').first().json.rows.length;\n\nconst hit = (r) => r.status === r.expected;\nconst isGenerated = (r) => r.generated === true || r.generated === 'true';\nconst pct = (a, b) => (b ? Math.round((a / b) * 100) : 0) + '%';\nconst tally = (list) => ({ total: list.length, correct: list.filter(hit).length });\nconst esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');\n\nconst all = tally(results);\nconst fixed = tally(results.filter((r) => !isGenerated(r)));\nconst generated = tally(results.filter(isGenerated));\nconst clear = tally(results.filter((r) => !r.borderline));\nconst injections = results.filter((r) => r.is_injection);\nconst blocked = injections.filter((r) => r.status === 'Rejected').length;\nconst notScored = totalCases - results.length;\nconst misses = results.filter((r) => !hit(r));\n\nconst cell = 'padding:8px 12px;border-bottom:1px solid #e5e7eb;';\nconst line = (label, value, detail) =>\n  `<tr><td style=\"${cell}\">${label}</td><td style=\"${cell}font-weight:700\">${value}</td><td style=\"${cell}color:#6b7280\">${detail}</td></tr>`;\n\nconst summary = [\n  line('Overall accuracy', pct(all.correct, all.total), `${all.correct} of ${all.total} cases`),\n  line('Fixed test set', pct(fixed.correct, fixed.total), `${fixed.correct} of ${fixed.total}`),\n  line('AI-generated CVs', pct(generated.correct, generated.total), `${generated.correct} of ${generated.total}`),\n  line('Clear-cut cases', pct(clear.correct, clear.total), `${clear.correct} of ${clear.total}`),\n  line('Injection attempts rejected', `${blocked} of ${injections.length}`, ''),\n  line('New test CVs written this run', String(newCases), newCases ? 'replaced the previous generated set' : 'writing failed, previous set reused'),\n  line('Not scored because of errors', String(notScored), ''),\n].join('');\n\nconst tag = (text, color) =>\n  `<span style=\"display:inline-block;margin-left:6px;padding:2px 8px;border-radius:10px;background:${color};font-size:12px\">${text}</span>`;\n\nconst cards = misses.map((m) => `\n  <div style=\"border:1px solid #e5e7eb;border-left:4px solid #dc2626;border-radius:8px;padding:14px 16px;margin:12px 0\">\n    <div style=\"font-weight:700;font-size:15px\">${esc(m.id)} &middot; ${esc(m.job_title)}\n      ${isGenerated(m) ? tag('AI-generated CV', '#fef3c7') : tag('fixed case', '#e0e7ff')}\n      ${m.borderline ? tag('borderline', '#f3f4f6') : ''}\n    </div>\n    <table style=\"margin-top:10px;border-collapse:collapse;font-size:14px\">\n      <tr><td style=\"padding:3px 14px 3px 0;color:#6b7280\">Expected</td><td style=\"font-weight:700\">${esc(m.expected)}</td></tr>\n      <tr><td style=\"padding:3px 14px 3px 0;color:#6b7280\">AI decision</td><td style=\"font-weight:700\">${esc(m.status)} (score ${esc(m.score)})</td></tr>\n    </table>\n    <p style=\"margin:10px 0 4px;color:#6b7280;font-size:13px\">Why we expected ${esc(m.expected)}</p>\n    <p style=\"margin:0;font-size:14px\">${esc(m.why)}</p>\n    <p style=\"margin:10px 0 4px;color:#6b7280;font-size:13px\">What the AI said</p>\n    <p style=\"margin:0;font-size:14px\">${esc(m.reason)}</p>\n    ${isGenerated(m) ? '<p style=\"margin:10px 0 0;font-size:13px;color:#92400e\">This CV was written by AI. Open it in the eval_cases table and check that it follows the profile before treating this as a screening mistake.</p>' : ''}\n  </div>`).join('');\n\nconst html = `\n<div style=\"font-family:Arial,Helvetica,sans-serif;color:#111827;max-width:680px\">\n  <h2 style=\"margin:0 0 4px\">Screening accuracy check</h2>\n  <p style=\"margin:0 0 16px;color:#6b7280\">${$now.toFormat('d MMMM yyyy, HH:mm')}</p>\n  <table style=\"border-collapse:collapse;font-size:14px;width:100%\">${summary}</table>\n  <h3 style=\"margin:24px 0 4px\">Disagreements (${misses.length})</h3>\n  ${misses.length ? cards : '<p style=\"color:#047857\">None. The AI agreed with the expected decision in every case.</p>'}\n</div>`;\n\nreturn [{\n  json: {\n    total: all.total,\n    correct: all.correct,\n    clear_total: clear.total,\n    clear_correct: clear.correct,\n    injection_total: injections.length,\n    injection_blocked: blocked,\n    subject: `CV Analysis accuracy: ${pct(all.correct, all.total)} (${all.correct} of ${all.total})`,\n    html,\n  },\n}];"
+        "jsCode": "// Runs once, after the scoring loop, on all results. Builds the numbers and the email.\nconst scored = (r) => r.id && r.reason && ['Accepted', 'Rejected'].includes(r.status) && Number.isFinite(Number(r.score));\nconst results = $input.all().map((item) => item.json).filter(scored);\nconst totalCases = $('Get Cases').all().length;\nconst newCases = $('Collect').first().json.rows.length;\n\nconst hit = (r) => r.status === r.expected;\nconst isGenerated = (r) => r.generated === true || r.generated === 'true';\nconst pct = (a, b) => (b ? Math.round((a / b) * 100) + '%' : '—');\nconst tally = (list) => ({ total: list.length, correct: list.filter(hit).length });\nconst esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');\n\nconst all = tally(results);\nconst fixed = tally(results.filter((r) => !isGenerated(r)));\nconst generated = tally(results.filter(isGenerated));\nconst clear = tally(results.filter((r) => !r.borderline));\nconst injections = results.filter((r) => r.is_injection);\nconst blocked = injections.filter((r) => r.status === 'Rejected').length;\nconst notScored = totalCases - results.length;\nconst misses = results.filter((r) => !hit(r));\n\nconst cell = 'padding:8px 12px;border-bottom:1px solid #e5e7eb;';\nconst line = (label, value, detail) =>\n  `<tr><td style=\"${cell}\">${label}</td><td style=\"${cell}font-weight:700\">${value}</td><td style=\"${cell}color:#6b7280\">${detail}</td></tr>`;\n\nconst summary = [\n  line('Overall accuracy', pct(all.correct, all.total), `${all.correct} of ${all.total} cases`),\n  line('Fixed test set', pct(fixed.correct, fixed.total), `${fixed.correct} of ${fixed.total}`),\n  line('AI-generated CVs', pct(generated.correct, generated.total), `${generated.correct} of ${generated.total}`),\n  line('Clear-cut cases', pct(clear.correct, clear.total), `${clear.correct} of ${clear.total}`),\n  line('Injection attempts rejected', `${blocked} of ${injections.length}`, ''),\n  line('New test CVs written this run', String(newCases), newCases ? 'replaced the previous generated set' : 'writing failed, previous set reused'),\n  line('Not scored because of errors', String(notScored), ''),\n].join('');\n\nconst tag = (text, color) =>\n  `<span style=\"display:inline-block;margin-left:6px;padding:2px 8px;border-radius:10px;background:${color};font-size:12px\">${text}</span>`;\n\nconst cards = misses.map((m) => `\n  <div style=\"border:1px solid #e5e7eb;border-left:4px solid #dc2626;border-radius:8px;padding:14px 16px;margin:12px 0\">\n    <div style=\"font-weight:700;font-size:15px\">${esc(m.id)} &middot; ${esc(m.job_title)}\n      ${isGenerated(m) ? tag('AI-generated CV', '#fef3c7') : tag('fixed case', '#e0e7ff')}\n      ${m.borderline ? tag('borderline', '#f3f4f6') : ''}\n    </div>\n    <table style=\"margin-top:10px;border-collapse:collapse;font-size:14px\">\n      <tr><td style=\"padding:3px 14px 3px 0;color:#6b7280\">Expected</td><td style=\"font-weight:700\">${esc(m.expected)}</td></tr>\n      <tr><td style=\"padding:3px 14px 3px 0;color:#6b7280\">AI decision</td><td style=\"font-weight:700\">${esc(m.status)} (score ${esc(m.score)})</td></tr>\n    </table>\n    <p style=\"margin:10px 0 4px;color:#6b7280;font-size:13px\">Why we expected ${esc(m.expected)}</p>\n    <p style=\"margin:0;font-size:14px\">${esc(m.why)}</p>\n    <p style=\"margin:10px 0 4px;color:#6b7280;font-size:13px\">What the AI said</p>\n    <p style=\"margin:0;font-size:14px\">${esc(m.reason)}</p>\n    ${isGenerated(m) ? '<p style=\"margin:10px 0 0;font-size:13px;color:#92400e\">This CV was written by AI. Open it in the eval_cases table and check that it follows the profile before treating this as a screening mistake.</p>' : ''}\n  </div>`).join('');\n\nconst html = `\n<div style=\"font-family:Arial,Helvetica,sans-serif;color:#111827;max-width:680px\">\n  <h2 style=\"margin:0 0 4px\">Screening accuracy check</h2>\n  <p style=\"margin:0 0 16px;color:#6b7280\">${$now.toFormat('d MMMM yyyy, HH:mm')}</p>\n  <table style=\"border-collapse:collapse;font-size:14px;width:100%\">${summary}</table>\n  <h3 style=\"margin:24px 0 4px\">Disagreements (${misses.length})</h3>\n  ${misses.length ? cards : all.total ? '<p style=\"color:#047857\">None. The AI agreed with the expected decision in every case.</p>' : '<p style=\"color:#b91c1c\">No case could be scored in this run, so there is no accuracy result. This usually means the AI provider\\'s daily quota was used up. The run was not saved to eval_runs.</p>'}\n</div>`;\n\nreturn [{\n  json: {\n    total: all.total,\n    correct: all.correct,\n    clear_total: clear.total,\n    clear_correct: clear.correct,\n    injection_total: injections.length,\n    injection_blocked: blocked,\n    subject: all.total ? `CV Analysis accuracy: ${pct(all.correct, all.total)} (${all.correct} of ${all.total})` : `CV Analysis accuracy check failed: no cases scored`,\n    html,\n  },\n}];"
       },
       "name": "Summarize",
       "type": "n8n-nodes-base.code",
@@ -509,8 +512,8 @@
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        624,
-        784
+        912,
+        736
       ],
       "id": "0661e722-442d-46b9-a481-72eda5c644a7",
       "credentials": {
@@ -534,8 +537,8 @@
       "type": "n8n-nodes-base.emailSend",
       "typeVersion": 2.1,
       "position": [
-        880,
-        784
+        1152,
+        944
       ],
       "id": "49ae2d5c-ed39-4963-ba61-43b35312113d",
       "webhookId": "023bde32-2f1e-4e2f-a7c3-9a8cc5113a9b",
@@ -548,7 +551,7 @@
     },
     {
       "parameters": {
-        "model": "openai/gpt-oss-120b",
+        "model": "openai/gpt-oss-20b",
         "options": {
           "temperature": 0.7
         }
@@ -592,6 +595,39 @@
       "waitBetweenTries": 5000,
       "id": "06a91a22-b9cf-47a5-9b48-97caca390660",
       "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "ba91ef80-b2c2-4b14-b391-89f609822c7f",
+              "leftValue": "={{ $json.total }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        592,
+        784
+      ],
+      "id": "d333d50b-95f4-4511-b193-41435c6befab",
+      "name": "Anything Scored?"
     }
   ],
   "pinData": {},
@@ -793,7 +829,7 @@
       "main": [
         [
           {
-            "node": "Save Run",
+            "node": "Anything Scored?",
             "type": "main",
             "index": 0
           }
@@ -839,6 +875,24 @@
           }
         ]
       ]
+    },
+    "Anything Scored?": {
+      "main": [
+        [
+          {
+            "node": "Save Run",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": true,
@@ -847,7 +901,7 @@
     "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "fc46ac12-916b-4986-88b7-8556562d1810",
+  "versionId": "8183275d-6766-4180-a57a-b46e97c5687c",
   "meta": {
     "instanceId": "51718d675df0744bcbaf923a0726fcd9e53c3c4aa671e45d38764b6c3359f352"
   },
