@@ -74,7 +74,7 @@ The important part: **the browser only talks to n8n.** The pages don't know the 
 | 3 | `jobs` | Careers page / HR | Lists positions (public) and adds new ones (HR only) |
 | 4 | `screen-candidates` | HR presses Screen | Scores up to 10 unscored applicants of a job and saves the results |
 | 5 | `list-candidates` | HR opens a position | Returns applicants with their results, and a short-lived link to a CV |
-| 6 | `error-handler` | Any workflow fails | Logs the error and emails a link to the failed run |
+| 6 | `error-handler` | Any workflow fails | Logs every error and emails a link to the failed run, at most once per hour per workflow |
 | 7 | `accuracy-check` | Every 2 days | Writes new test CVs, scores them with a fixed test set, emails a report |
 
 ### A few decisions worth knowing
@@ -222,7 +222,7 @@ Every external call (AI, database, storage, email) can fail. Each failure was pl
 | Scoring fails for one applicant | Retried (5 s apart). If it still fails, only that applicant is skipped; the error output keeps the rest of the batch going | They stay **Not screened** and are picked up on the next press |
 | HR presses **Screen** twice, or two HR users at once | Only unscored applicants are fetched, and results are saved as an upsert on `(job_id, candidate_id)` | No duplicate or conflicting results |
 | Job has no unscored applicants | Short-circuited before any AI call | `{"screened": 0}`, no tokens spent |
-| Any workflow crashes | `6-error-handler` saves the workflow, node, message and a link to the run in `workflow_errors`, then sends an email alert | — |
+| Any workflow crashes | `6-error-handler` saves the workflow, node, message and a link to the run in `workflow_errors`, then sends an email alert (at most one per workflow per hour, so an outage does not flood the inbox) | — |
 
 ### In the accuracy check (workflow 7)
 

@@ -21,21 +21,6 @@
     {
       "parameters": {
         "respondWith": "json",
-        "responseBody": "{\"ok\": true}",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.respondToWebhook",
-      "typeVersion": 1.5,
-      "position": [
-        1328,
-        -288
-      ],
-      "id": "5f3b6beb-03d9-49f6-9914-652573b7c52b",
-      "name": "Respond to Webhook"
-    },
-    {
-      "parameters": {
-        "respondWith": "json",
         "responseBody": "{\"ok\": false, \"error\": \"invalid_request\"}",
         "options": {
           "responseCode": 400
@@ -167,23 +152,6 @@
     },
     {
       "parameters": {
-        "respondWith": "json",
-        "responseBody": "={\"ok\": false, \"error\": \"{{ JSON.stringify($json).includes('duplicate') ? 'already_applied' : 'save_failed' }}\"}",
-        "options": {
-          "responseCode": 409
-        }
-      },
-      "type": "n8n-nodes-base.respondToWebhook",
-      "typeVersion": 1.5,
-      "position": [
-        1344,
-        16
-      ],
-      "id": "56f2c558-b3c0-4ae7-a4b7-dfd8b0c893fe",
-      "name": "Respond save failed"
-    },
-    {
-      "parameters": {
         "conditions": {
           "options": {
             "caseSensitive": true,
@@ -254,7 +222,39 @@
         0
       ],
       "id": "f4019d5d-b11f-48b7-ba7b-5acd2a8717c8",
-      "name": "if specified fields is completed"
+      "name": "Valid Request?"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\"ok\": true}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1328,
+        -288
+      ],
+      "id": "5f3b6beb-03d9-49f6-9914-652573b7c52b",
+      "name": "Respond Saved"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\"ok\": false, \"error\": \"{{ JSON.stringify($json).includes('duplicate') ? 'already_applied' : 'save_failed' }}\"}",
+        "options": {
+          "responseCode": 409
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1344,
+        16
+      ],
+      "id": "56f2c558-b3c0-4ae7-a4b7-dfd8b0c893fe",
+      "name": "Respond Save Failed"
     }
   ],
   "pinData": {},
@@ -263,7 +263,7 @@
       "main": [
         [
           {
-            "node": "if specified fields is completed",
+            "node": "Valid Request?",
             "type": "main",
             "index": 0
           }
@@ -296,21 +296,21 @@
       "main": [
         [
           {
-            "node": "Respond to Webhook",
+            "node": "Respond Saved",
             "type": "main",
             "index": 0
           }
         ],
         [
           {
-            "node": "Respond save failed",
+            "node": "Respond Save Failed",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "if specified fields is completed": {
+    "Valid Request?": {
       "main": [
         [
           {
@@ -338,7 +338,7 @@
     "errorWorkflow": "eGFln5rPOl0IiNUx",
     "callerPolicy": "workflowsFromSameOwner"
   },
-  "versionId": "0dc3dc56-b261-4a7a-b543-ae896ca23d18",
+  "versionId": "7e2ca7dc-f316-4211-acb2-41463619aee2",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "51718d675df0744bcbaf923a0726fcd9e53c3c4aa671e45d38764b6c3359f352"

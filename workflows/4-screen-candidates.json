@@ -27,85 +27,6 @@
     },
     {
       "parameters": {
-        "operation": "getAll",
-        "tableId": "jobs",
-        "limit": 1,
-        "orderBy": "created_at.desc",
-        "filters": {
-          "conditions": [
-            {
-              "keyName": "id",
-              "condition": "eq",
-              "keyValue": "={{ $json.body.job_id }}"
-            }
-          ]
-        }
-      },
-      "type": "n8n-nodes-base.supabase",
-      "typeVersion": 1,
-      "position": [
-        224,
-        0
-      ],
-      "id": "d8470ebf-1e99-493b-bcaf-e6fa886c8732",
-      "name": "Get unique jop",
-      "credentials": {
-        "supabaseApi": {
-          "id": "YMAlSFhPlvQLq62o",
-          "name": "Supabase account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "respondWith": "allIncomingItems",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.respondToWebhook",
-      "typeVersion": 1.5,
-      "position": [
-        1680,
-        -288
-      ],
-      "id": "6bceb368-954c-41f6-bfb2-ff91f3fc11f8",
-      "name": "Respond to Webhook"
-    },
-    {
-      "parameters": {
-        "conditions": {
-          "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "strict",
-            "version": 3
-          },
-          "conditions": [
-            {
-              "id": "1623d765-2489-462b-8581-8c813f0bfde8",
-              "leftValue": "={{ $json.id }}",
-              "rightValue": "",
-              "operator": {
-                "type": "string",
-                "operation": "notEmpty",
-                "singleValue": true
-              }
-            }
-          ],
-          "combinator": "and"
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2.3,
-      "position": [
-        672,
-        0
-      ],
-      "id": "a60addae-7345-42ab-8ec2-14d413f1a944",
-      "name": "Has candidates"
-    },
-    {
-      "parameters": {
         "respondWith": "json",
         "responseBody": "{\"ok\": true, \"screened\": 0}",
         "options": {
@@ -238,8 +159,8 @@
         "workflowInputs": {
           "mappingMode": "defineBelow",
           "value": {
-            "job_title": "={{ $('Get unique jop').item.json.title }}",
-            "requirements": "={{ $('Get unique jop').item.json.requirements }}",
+            "job_title": "={{ $('Get Job').item.json.title }}",
+            "requirements": "={{ $('Get Job').item.json.requirements }}",
             "cv_text": "={{ $json.cv_text }}"
           },
           "matchingColumns": [],
@@ -290,6 +211,85 @@
       "id": "e5c1efdf-4ba8-41e5-8e29-ef1dfe75ef63",
       "name": "Score Candidate",
       "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "jobs",
+        "limit": 1,
+        "orderBy": "created_at.desc",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{ $json.body.job_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        224,
+        0
+      ],
+      "id": "d8470ebf-1e99-493b-bcaf-e6fa886c8732",
+      "name": "Get Job",
+      "credentials": {
+        "supabaseApi": {
+          "id": "YMAlSFhPlvQLq62o",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "1623d765-2489-462b-8581-8c813f0bfde8",
+              "leftValue": "={{ $json.id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        672,
+        0
+      ],
+      "id": "a60addae-7345-42ab-8ec2-14d413f1a944",
+      "name": "Has Candidates?"
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1680,
+        -288
+      ],
+      "id": "6bceb368-954c-41f6-bfb2-ff91f3fc11f8",
+      "name": "Respond Results"
     }
   ],
   "pinData": {},
@@ -298,14 +298,47 @@
       "main": [
         [
           {
-            "node": "Get unique jop",
+            "node": "Get Job",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Get unique jop": {
+    "Save Screening": {
+      "main": [
+        [
+          {
+            "node": "Respond Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Candidates": {
+      "main": [
+        [
+          {
+            "node": "Has Candidates?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Score Candidate": {
+      "main": [
+        [
+          {
+            "node": "Save Screening",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Job": {
       "main": [
         [
           {
@@ -316,12 +349,7 @@
         ]
       ]
     },
-    "Respond to Webhook": {
-      "main": [
-        []
-      ]
-    },
-    "Has candidates": {
+    "Has Candidates?": {
       "main": [
         [
           {
@@ -339,37 +367,9 @@
         ]
       ]
     },
-    "Save Screening": {
+    "Respond Results": {
       "main": [
-        [
-          {
-            "node": "Respond to Webhook",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Get Candidates": {
-      "main": [
-        [
-          {
-            "node": "Has candidates",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Score Candidate": {
-      "main": [
-        [
-          {
-            "node": "Save Screening",
-            "type": "main",
-            "index": 0
-          }
-        ]
+        []
       ]
     }
   },
@@ -382,7 +382,7 @@
     "errorWorkflow": "eGFln5rPOl0IiNUx",
     "callerPolicy": "workflowsFromSameOwner"
   },
-  "versionId": "f7acfdb9-30b5-4720-9381-93ddff9e1f2f",
+  "versionId": "237a536a-95e3-48c5-a335-f0d11b9249d9",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "51718d675df0744bcbaf923a0726fcd9e53c3c4aa671e45d38764b6c3359f352"

@@ -3,59 +3,6 @@
   "nodes": [
     {
       "parameters": {
-        "path": "jobs",
-        "responseMode": "responseNode",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.webhook",
-      "typeVersion": 2.1,
-      "position": [
-        0,
-        0
-      ],
-      "id": "fb197acd-31ab-4e3c-99b6-5169a25935a2",
-      "name": "Webhook",
-      "webhookId": "174d550c-5dbc-4cd8-84fd-8172f9d0e08f"
-    },
-    {
-      "parameters": {
-        "operation": "getAll",
-        "tableId": "jobs",
-        "returnAll": true,
-        "orderBy": "created_at.desc"
-      },
-      "type": "n8n-nodes-base.supabase",
-      "typeVersion": 1,
-      "position": [
-        224,
-        0
-      ],
-      "id": "416b1d76-277d-4617-b713-f83251d29b8a",
-      "name": "Get Data from DB",
-      "alwaysOutputData": true,
-      "credentials": {
-        "supabaseApi": {
-          "id": "YMAlSFhPlvQLq62o",
-          "name": "Supabase account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "respondWith": "allIncomingItems",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.respondToWebhook",
-      "typeVersion": 1.5,
-      "position": [
-        448,
-        0
-      ],
-      "id": "9de52b48-98f9-4166-b249-9b99aaac6db4",
-      "name": "Respond to Webhook"
-    },
-    {
-      "parameters": {
         "httpMethod": "POST",
         "path": "jobs",
         "authentication": "headerAuth",
@@ -80,45 +27,36 @@
     },
     {
       "parameters": {
-        "respondWith": "json",
-        "responseBody": "{\"ok\": false, \"error\": \"invalid_request\"}",
-        "options": {
-          "responseCode": 400
-        }
+        "path": "jobs",
+        "responseMode": "responseNode",
+        "options": {}
       },
-      "type": "n8n-nodes-base.respondToWebhook",
-      "typeVersion": 1.5,
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
       "position": [
-        480,
-        752
+        0,
+        0
       ],
-      "id": "e27b3e49-7f77-4526-ad55-afc176f85ca8",
-      "name": "Respond to Webhook1"
+      "id": "fb197acd-31ab-4e3c-99b6-5169a25935a2",
+      "name": "Webhook List Jobs",
+      "webhookId": "174d550c-5dbc-4cd8-84fd-8172f9d0e08f"
     },
     {
       "parameters": {
+        "operation": "getAll",
         "tableId": "jobs",
-        "fieldsUi": {
-          "fieldValues": [
-            {
-              "fieldId": "title",
-              "fieldValue": "={{ $json.body.title }}"
-            },
-            {
-              "fieldId": "requirements",
-              "fieldValue": "={{ $json.body.requirements }}"
-            }
-          ]
-        }
+        "returnAll": true,
+        "orderBy": "created_at.desc"
       },
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        448,
-        416
+        224,
+        0
       ],
-      "id": "11239455-495b-406c-8657-d8c08f457b54",
-      "name": "Create a job",
+      "id": "416b1d76-277d-4617-b713-f83251d29b8a",
+      "name": "Get Jobs",
+      "alwaysOutputData": true,
       "credentials": {
         "supabaseApi": {
           "id": "YMAlSFhPlvQLq62o",
@@ -128,16 +66,17 @@
     },
     {
       "parameters": {
+        "respondWith": "allIncomingItems",
         "options": {}
       },
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        672,
-        416
+        448,
+        0
       ],
-      "id": "c7acd44b-ee01-471c-bcc2-062ef704935f",
-      "name": "Respond to Webhook2"
+      "id": "9de52b48-98f9-4166-b249-9b99aaac6db4",
+      "name": "Respond Jobs"
     },
     {
       "parameters": {
@@ -181,67 +120,128 @@
         576
       ],
       "id": "7bd278ad-0112-4074-b54b-5a763533860f",
-      "name": "If have access"
+      "name": "Valid Job?"
+    },
+    {
+      "parameters": {
+        "tableId": "jobs",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "title",
+              "fieldValue": "={{ $json.body.title }}"
+            },
+            {
+              "fieldId": "requirements",
+              "fieldValue": "={{ $json.body.requirements }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        448,
+        416
+      ],
+      "id": "11239455-495b-406c-8657-d8c08f457b54",
+      "name": "Create Job",
+      "credentials": {
+        "supabaseApi": {
+          "id": "YMAlSFhPlvQLq62o",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        672,
+        416
+      ],
+      "id": "c7acd44b-ee01-471c-bcc2-062ef704935f",
+      "name": "Respond Created"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\"ok\": false, \"error\": \"invalid_request\"}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        672,
+        720
+      ],
+      "id": "e27b3e49-7f77-4526-ad55-afc176f85ca8",
+      "name": "Respond Invalid"
     }
   ],
   "pinData": {},
   "connections": {
-    "Webhook": {
-      "main": [
-        [
-          {
-            "node": "Get Data from DB",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Get Data from DB": {
-      "main": [
-        [
-          {
-            "node": "Respond to Webhook",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Webhook Add Job": {
       "main": [
         [
           {
-            "node": "If have access",
+            "node": "Valid Job?",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Create a job": {
+    "Webhook List Jobs": {
       "main": [
         [
           {
-            "node": "Respond to Webhook2",
+            "node": "Get Jobs",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "If have access": {
+    "Get Jobs": {
       "main": [
         [
           {
-            "node": "Create a job",
+            "node": "Respond Jobs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Valid Job?": {
+      "main": [
+        [
+          {
+            "node": "Create Job",
             "type": "main",
             "index": 0
           }
         ],
         [
           {
-            "node": "Respond to Webhook1",
+            "node": "Respond Invalid",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Job": {
+      "main": [
+        [
+          {
+            "node": "Respond Created",
             "type": "main",
             "index": 0
           }
@@ -258,7 +258,7 @@
     "errorWorkflow": "eGFln5rPOl0IiNUx",
     "callerPolicy": "workflowsFromSameOwner"
   },
-  "versionId": "ccbf83b9-2508-4cb4-8190-737b53cfd7af",
+  "versionId": "d16d9eb3-4685-4479-803b-ddd9ffd7e879",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "51718d675df0744bcbaf923a0726fcd9e53c3c4aa671e45d38764b6c3359f352"

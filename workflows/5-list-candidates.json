@@ -3,83 +3,6 @@
   "nodes": [
     {
       "parameters": {
-        "path": "candidates",
-        "authentication": "headerAuth",
-        "responseMode": "responseNode",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.webhook",
-      "typeVersion": 2.1,
-      "position": [
-        0,
-        0
-      ],
-      "id": "9db6d66b-b4bc-42d4-95df-b0622f7dfdd0",
-      "name": "Webhook",
-      "webhookId": "5a5514e4-85b2-4204-a1eb-ff5242699ab9",
-      "credentials": {
-        "httpHeaderAuth": {
-          "id": "1SaIYWjTqeCziuya",
-          "name": "HR Key"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "url": "https://zbcukhcctliduxbvflce.supabase.co/rest/v1/candidates",
-        "authentication": "predefinedCredentialType",
-        "nodeCredentialType": "supabaseApi",
-        "sendQuery": true,
-        "queryParameters": {
-          "parameters": [
-            {
-              "name": "job_id",
-              "value": "=eq.{{ $json.query.job_id }}"
-            },
-            {
-              "name": "select",
-              "value": "id,created_at,full_name,email,phone,current_title,years_experience,university,degree,graduation_year,skills,cv_path,screenings(status,score,reason)"
-            },
-            {
-              "name": "order",
-              "value": "created_at.desc"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.5,
-      "position": [
-        224,
-        0
-      ],
-      "id": "9b072e0d-eca3-4fe8-a3d8-8ddaff632078",
-      "name": "HTTP Request",
-      "alwaysOutputData": true,
-      "credentials": {
-        "supabaseApi": {
-          "id": "YMAlSFhPlvQLq62o",
-          "name": "Supabase account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "respondWith": "allIncomingItems",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.respondToWebhook",
-      "typeVersion": 1.5,
-      "position": [
-        448,
-        0
-      ],
-      "id": "321d5ed8-9061-4bde-b14a-3b8ff41e2a15",
-      "name": "Respond to Webhook"
-    },
-    {
-      "parameters": {
         "path": "cv-link",
         "authentication": "headerAuth",
         "responseMode": "responseNode",
@@ -129,6 +52,83 @@
     },
     {
       "parameters": {
+        "path": "candidates",
+        "authentication": "headerAuth",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "9db6d66b-b4bc-42d4-95df-b0622f7dfdd0",
+      "name": "Webhook Candidates",
+      "webhookId": "5a5514e4-85b2-4204-a1eb-ff5242699ab9",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "1SaIYWjTqeCziuya",
+          "name": "HR Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://zbcukhcctliduxbvflce.supabase.co/rest/v1/candidates",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "job_id",
+              "value": "=eq.{{ $json.query.job_id }}"
+            },
+            {
+              "name": "select",
+              "value": "id,created_at,full_name,email,phone,current_title,years_experience,university,degree,graduation_year,skills,cv_path,screenings(status,score,reason)"
+            },
+            {
+              "name": "order",
+              "value": "created_at.desc"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        224,
+        0
+      ],
+      "id": "9b072e0d-eca3-4fe8-a3d8-8ddaff632078",
+      "name": "Get Candidates",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "YMAlSFhPlvQLq62o",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        448,
+        0
+      ],
+      "id": "321d5ed8-9061-4bde-b14a-3b8ff41e2a15",
+      "name": "Respond Candidates"
+    },
+    {
+      "parameters": {
         "respondWith": "json",
         "responseBody": "={\"url\": \"https://zbcukhcctliduxbvflce.supabase.co/storage/v1{{ $json.signedURL }}\"}",
         "options": {}
@@ -140,33 +140,11 @@
         400
       ],
       "id": "1a911a81-a11f-416c-bdf4-692e2c54fa47",
-      "name": "Respond to Webhook1"
+      "name": "Respond CV Link"
     }
   ],
   "pinData": {},
   "connections": {
-    "Webhook": {
-      "main": [
-        [
-          {
-            "node": "HTTP Request",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "HTTP Request": {
-      "main": [
-        [
-          {
-            "node": "Respond to Webhook",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Webhook CV Link": {
       "main": [
         [
@@ -182,7 +160,29 @@
       "main": [
         [
           {
-            "node": "Respond to Webhook1",
+            "node": "Respond CV Link",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook Candidates": {
+      "main": [
+        [
+          {
+            "node": "Get Candidates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Candidates": {
+      "main": [
+        [
+          {
+            "node": "Respond Candidates",
             "type": "main",
             "index": 0
           }
@@ -199,7 +199,7 @@
     "errorWorkflow": "eGFln5rPOl0IiNUx",
     "callerPolicy": "workflowsFromSameOwner"
   },
-  "versionId": "5c82413f-bb8f-445a-b825-8540c9a024e8",
+  "versionId": "3f3affa2-4191-476f-a5e6-a7c24a41befa",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "51718d675df0744bcbaf923a0726fcd9e53c3c4aa671e45d38764b6c3359f352"

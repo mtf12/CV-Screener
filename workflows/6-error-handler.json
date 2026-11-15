@@ -6,8 +6,8 @@
       "type": "n8n-nodes-base.errorTrigger",
       "typeVersion": 1,
       "position": [
-        0,
-        0
+        -256,
+        -16
       ],
       "id": "50078966-26f3-4c0f-9c82-92eed56b76ac",
       "name": "Error Trigger"
@@ -39,8 +39,8 @@
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        224,
-        0
+        -32,
+        -16
       ],
       "id": "68bfc33c-f438-47e3-a75c-fedd51b0ae25",
       "name": "Log Error",
@@ -57,7 +57,7 @@
         "toEmail": "mohammedtalaatfayez@icloud.com",
         "subject": "={{ 'CV Analysis error: ' + $('Error Trigger').item.json.workflow.name }}",
         "emailFormat": "text",
-        "text": "=Workflow: {{ $('Error Trigger').item.json.workflow.name }}\nNode: {{ $('Error Trigger').item.json.execution.lastNodeExecuted }}\nError: {{ String($('Error Trigger').item.json.execution.error.message).slice(0, 500) }}\n\nOpen the failed execution:\n{{ $('Error Trigger').item.json.execution.url }}",
+        "text": "=Workflow: {{ $('Error Trigger').item.json.workflow.name }}\nNode: {{ $('Error Trigger').item.json.execution.lastNodeExecuted }}\nError: {{ String($('Error Trigger').item.json.execution.error.message).slice(0, 500) }}\n\nOpen the failed execution:\n{{ $('Error Trigger').item.json.execution.url }}\n\nFurther errors from this workflow in the next hour are logged in workflow_errors but not emailed.",
         "options": {
           "appendAttribution": false
         }
@@ -65,8 +65,8 @@
       "type": "n8n-nodes-base.emailSend",
       "typeVersion": 2.1,
       "position": [
-        448,
-        0
+        672,
+        -112
       ],
       "id": "5824c5c8-3e7f-4cf7-9752-d6475c9f0197",
       "name": "Send Alert Email",
@@ -76,7 +76,82 @@
           "id": "uv9D4wuGFuwcxEum",
           "name": "SMTP account"
         }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "url": "https://zbcukhcctliduxbvflce.supabase.co/rest/v1/workflow_errors",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "workflow_name",
+              "value": "=eq.{{ $('Error Trigger').item.json.workflow.name }}"
+            },
+            {
+              "name": "and",
+              "value": "=(created_at.gt.{{ $now.minus({ minutes: 60 }).toUTC().toISO() }},created_at.lt.{{ DateTime.fromISO($('Log Error').item.json.created_at).toUTC().toISO() }})"
+            },
+            {
+              "name": "select",
+              "value": "id"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Earlier Errors",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        160,
+        -16
+      ],
+      "alwaysOutputData": true,
+      "id": "ac4d4c19-6a1f-4696-bafd-827f0493840b",
+      "credentials": {
+        "supabaseApi": {
+          "id": "YMAlSFhPlvQLq62o",
+          "name": "Supabase account"
+        }
       }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f1",
+              "leftValue": "={{ $input.all().filter((i) => i.json.id).length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "name": "First In An Hour?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        416,
+        -16
+      ],
+      "executeOnce": true,
+      "id": "d4b92fd5-1cbb-48bb-852b-9e7fae29dc7d"
     }
   ],
   "pinData": {},
@@ -96,6 +171,28 @@
       "main": [
         [
           {
+            "node": "Earlier Errors",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Earlier Errors": {
+      "main": [
+        [
+          {
+            "node": "First In An Hour?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "First In An Hour?": {
+      "main": [
+        [
+          {
             "node": "Send Alert Email",
             "type": "main",
             "index": 0
@@ -110,7 +207,7 @@
     "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "cefc4fd2-efaf-4e49-a472-0cd71f2dd89a",
+  "versionId": "305fba6c-470f-496c-a10b-6cc41c60e4a6",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "51718d675df0744bcbaf923a0726fcd9e53c3c4aa671e45d38764b6c3359f352"
