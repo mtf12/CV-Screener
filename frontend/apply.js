@@ -117,7 +117,7 @@ function checkFile(file, notice) {
 
 // Send the file to the parse-cv workflow, which decides whether the PDF really
 // is a CV and reads the details out of it. Both dropzones go through here.
-// The verdict is one of: 'cv', 'not_pdf', 'not_cv' or 'unavailable'.
+// The verdict is one of: 'cv', 'not_pdf', 'no_text', 'not_cv' or 'unavailable'.
 async function readCv(file, notice, busyText) {
   state.parsing = true;
   setFile(file);
@@ -132,6 +132,7 @@ async function readCv(file, notice, busyText) {
   setBusy(false);
 
   if (res.status === 400) return { verdict: 'not_pdf' };
+  if (res.status === 422 && res.data && res.data.error === 'no_text') return { verdict: 'no_text' };
   if (res.status === 422 || (res.ok && res.data && res.data.is_cv === false)) return { verdict: 'not_cv' };
   if (!res.ok || !res.data) return { verdict: 'unavailable' }; // AI quota or outage
   return { verdict: 'cv', data: res.data };
@@ -139,9 +140,12 @@ async function readCv(file, notice, busyText) {
 
 function rejectFile(verdict, notice) {
   setFile(null);
-  setNotice(notice, 'error', verdict === 'not_pdf'
-    ? 'Please upload your CV as a PDF file.'
-    : 'This file doesn’t look like a CV. Please upload your CV.');
+  const messages = {
+    not_pdf: 'Please upload your CV as a PDF file.',
+    no_text: 'We couldn’t read any text in this PDF. It may be a scanned image. Please upload a PDF with selectable text.',
+    not_cv: 'This file doesn’t look like a CV. Please upload your CV.',
+  };
+  setNotice(notice, 'error', messages[verdict]);
 }
 
 // Bottom dropzone: make sure the file is a CV and attach it. The form is left alone.
@@ -152,7 +156,7 @@ async function attachOnly(file) {
   clearNotice($('fill-notice'));
 
   const { verdict } = await readCv(file, notice, 'Checking your file…');
-  if (verdict === 'not_pdf' || verdict === 'not_cv') return rejectFile(verdict, notice);
+  if (verdict === 'not_pdf' || verdict === 'no_text' || verdict === 'not_cv') return rejectFile(verdict, notice);
   // If the check itself is down, keep the file instead of blocking the applicant.
   setNotice(notice, 'success', 'CV attached.');
 }
@@ -165,7 +169,7 @@ async function autofill(file) {
   clearNotice($('apply-notice'));
 
   const { verdict, data } = await readCv(file, notice, 'Reading your CV and filling in the form…');
-  if (verdict === 'not_pdf' || verdict === 'not_cv') return rejectFile(verdict, notice);
+  if (verdict === 'not_pdf' || verdict === 'no_text' || verdict === 'not_cv') return rejectFile(verdict, notice);
   if (verdict === 'unavailable') {
     return setNotice(notice, 'error', 'Autofill isn’t available right now. Your CV is still attached, so you can fill in the form yourself and submit, or press Refill form to try again.');
   }

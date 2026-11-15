@@ -112,8 +112,8 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        1216,
-        -224
+        1440,
+        -240
       ],
       "id": "e4c78447-302b-4602-8c7d-6e2a0478d816",
       "name": "Is CV?"
@@ -126,8 +126,8 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
       "typeVersion": 1,
       "position": [
-        848,
-        -32
+        1152,
+        -64
       ],
       "id": "99a3318b-9472-4f20-9403-71374f3eb0d2",
       "name": "Groq Chat Model",
@@ -149,8 +149,8 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        1472,
-        -240
+        1696,
+        -256
       ],
       "id": "d242500e-cd0f-4dc1-a4dd-e2c3337977bb",
       "name": "Respond CV Data"
@@ -166,8 +166,8 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        1456,
-        0
+        1696,
+        -64
       ],
       "id": "d539d991-5860-45de-9572-5db0cd3bc319",
       "name": "Respond Not CV"
@@ -230,13 +230,64 @@
       "type": "@n8n/n8n-nodes-langchain.informationExtractor",
       "typeVersion": 1.2,
       "position": [
-        848,
-        -224
+        1152,
+        -240
       ],
       "id": "eb195659-49fc-4540-beaa-5b2d9d3cc908",
       "name": "Extract CV Fields",
       "retryOnFail": true,
       "waitBetweenTries": 4000
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "dfa6f378-ff41-4e51-95cb-2d800d501a03",
+              "leftValue": "={{ ($json.text || '').trim() }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        640,
+        -224
+      ],
+      "id": "4afe516d-c550-4f72-810c-80fa883d89d9",
+      "name": "Has Text?"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\"is_cv\": false, \"error\": \"no_text\"}",
+        "options": {
+          "responseCode": 422
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        880,
+        -80
+      ],
+      "id": "41366889-462b-4565-84e8-e701f504e56a",
+      "name": "Respond No Text"
     }
   ],
   "pinData": {},
@@ -256,7 +307,7 @@
       "main": [
         [
           {
-            "node": "Extract CV Fields",
+            "node": "Has Text?",
             "type": "main",
             "index": 0
           }
@@ -325,6 +376,24 @@
           }
         ]
       ]
+    },
+    "Has Text?": {
+      "main": [
+        [
+          {
+            "node": "Extract CV Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond No Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": true,
@@ -336,7 +405,7 @@
     "errorWorkflow": "eGFln5rPOl0IiNUx",
     "callerPolicy": "workflowsFromSameOwner"
   },
-  "versionId": "47912808-f568-42c9-8dfe-8442f842eb95",
+  "versionId": "e2bc4439-650c-4ec6-a777-8ea7cf19f6bf",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "51718d675df0744bcbaf923a0726fcd9e53c3c4aa671e45d38764b6c3359f352"
