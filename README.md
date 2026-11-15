@@ -1,5 +1,8 @@
 # CV Analysis
 
+> [!NOTE]
+> **The project is fully working and stable.** Every feature described below works end to end. It is still under active development, and new features are added regularly to keep improving it.
+
 An AI-assisted hiring tool built with **n8n**.
 
 Applicants pick a job, drop in their CV, and the application form fills itself in. HR opens a dashboard, presses one button, and every applicant gets a score out of 100, a short reason, and an Accepted or Rejected label.
