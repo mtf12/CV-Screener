@@ -202,7 +202,7 @@
             {
               "name": "years_experience",
               "type": "number",
-              "description": "Years of work experience in the same field as current_title only. Add up the date ranges of the jobs in the experience section that belong to that field, treating Present as today, and ignore jobs in unrelated fields. Round to one decimal. Omit only if there are no dates and no stated number."
+              "description": "Years of work experience in the same field as current_title only. Take the date ranges of the jobs in that field, treating Present as today. If date ranges overlap, count the overlapping time only once: two jobs held at the same time do not add up to double the experience. Do not count internships or training periods. Ignore jobs in unrelated fields. Round to one decimal. Omit only if there are no dates and no stated number."
             },
             {
               "name": "university",
@@ -405,7 +405,7 @@
     "errorWorkflow": "eGFln5rPOl0IiNUx",
     "callerPolicy": "workflowsFromSameOwner"
   },
-  "versionId": "e2bc4439-650c-4ec6-a777-8ea7cf19f6bf",
+  "versionId": "34512817-c8e6-44ca-a236-c551ed18e362",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "51718d675df0744bcbaf923a0726fcd9e53c3c4aa671e45d38764b6c3359f352"
