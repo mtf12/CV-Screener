@@ -10,6 +10,10 @@
 
 An AI-assisted hiring tool built with **n8n**.
 
+| Careers page | HR dashboard |
+|---|---|
+| ![Careers page](docs/careers.png) | ![HR dashboard after screening](docs/hr.png) |
+
 Applicants pick a job, drop in their CV, and the application form fills itself in. HR opens a dashboard, presses one button, and every applicant gets a score out of 100, a short reason, and an Accepted or Rejected label.
 
 There is no traditional backend code here. The whole backend is eight n8n workflows.
@@ -147,6 +151,7 @@ Several parts of the project look the way they do because a test showed the firs
 ## Project structure
 
 ```
+docs/          screenshots used in this README
 frontend/      the three pages, their scripts and the stylesheet
 workflows/     the eight n8n workflows, ready to import
 database/      schema.sql for Supabase
