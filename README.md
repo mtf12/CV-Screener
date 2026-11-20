@@ -2,8 +2,8 @@
 
 > [!NOTE]
 > **Live demo:** https://cv-screener-frontend-eight.vercel.app
-> HR dashboard: https://cv-screener-frontend-eight.vercel.app/hr.html (access key available on request)
->
+> HR dashboard: https://cv-screener-frontend-eight.vercel.app/hr.html (key:M123456)
+> 
 > The pages are hosted on Vercel. The backend (n8n) runs on our own server and is published through a fixed ngrok address, so the demo is available while that server is online. [Where it runs](#where-it-runs) explains why.
 >
 > **The project is fully working and stable.** Every feature described below works end to end. It is still under active development, and new features are added regularly to keep improving it.
